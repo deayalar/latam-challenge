@@ -12,7 +12,7 @@ from typing import List
 
 class DelayModel:
 
-    TOP_10_FEATURES = [
+    TOP_FEATURES = [
         "OPERA_Latin American Wings", 
         "MES_7",
         "MES_10",
@@ -29,6 +29,7 @@ class DelayModel:
     ):
         self._model = None # Model should be saved in this attribute.
         self._threshold_in_minutes = 15
+        self.columns = None
 
     def preprocess(
         self,
@@ -55,8 +56,8 @@ class DelayModel:
             pd.get_dummies(data['MES'], prefix = 'MES')], 
             axis = 1
         )
-
-        features = features[self.TOP_10_FEATURES]
+        self.columns = features.columns
+        features = features[self.TOP_FEATURES]
 
         if target_column:
             target = pd.DataFrame(np.where(data['min_diff'] > self._threshold_in_minutes, 1, 0),

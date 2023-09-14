@@ -7,6 +7,10 @@ from challenge import app
 class TestBatchPipeline(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
+    
+    def test_health(self):
+        response = self.client.get("/health")
+        print(response)
         
     def test_should_get_predict(self):
         data = {
