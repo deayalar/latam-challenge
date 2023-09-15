@@ -1,7 +1,10 @@
 name: 'Continuous Delivery'
 
 on:
-  workflow_dispatch
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
 
 env:
   PROJECT_ID: misentimiento # Google Cloud project id
