@@ -40,6 +40,7 @@ async def post_predict(json: FlightsWrapper, response: Response) -> dict:
         month = 'MES_' + str(flight.month)
         if operator not in model.columns or flight_type not in model.columns or month not in model.columns:
             response.status_code = status.HTTP_400_BAD_REQUEST
+            return {}
         else:
             if operator in model.TOP_FEATURES:
                 feature[idx][model.TOP_FEATURES.index(operator)] = 1
