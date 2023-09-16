@@ -1,31 +1,51 @@
-Between XGBoost and Logistic Regression, your choice should depend on the specific context of your project and the criteria that are most important for your goals. Here's a comparison of the two models based on several factors:
+# LATAM Challenge
+In the sections below, I explain the steps I followed to solve each part of the challenge
+## Part I: Set up model
 
-Interpretability:
+### Step 1: Review the .ipynb file
 
-Logistic Regression: Generally easier to interpret because it is a linear model. You can clearly see the effect of each feature on the output.
-XGBoost: Can be less interpretable as it is based on an ensemble of decision trees, which can create complex decision boundaries.
-Performance:
+-   **Run, Review and Understand** the Jupyter Notebook thoroughly.
+-   **Identify the Best Model**: I analyzed the different models proposed by the DS and given that both models have similar performance. I considered other factors like simplicity and interpretability. **Logistic Regression** is a relatively simple algorithm that is easier to understand and interpret. Given that both models have the same performance, the simplicity of logistic regression becomes a significant advantage. Also, Logistic Regression would be less prone to overfitting compared to a more complex model like XGBoost. Looking at the metrics in the notebook, the models that perfoms better are those with balanced data and feature importance, Therefore I used that version of the models.
 
-Logistic Regression: May perform well for linearly separable data or when the relationship between features and target is approximately linear.
-XGBoost: Often achieves higher predictive performance, especially for complex, non-linear relationships in data. It utilizes gradient boosting framework which can be fine-tuned for better performance.
-Computational Efficiency:
+### Step 2: Transcribe the Code
 
-Logistic Regression: Generally computationally less intensive than XGBoost, quicker to train especially with a smaller dataset.
-XGBoost: Can be computationally intensive, particularly with large datasets and/or many features.
-Flexibility:
+-   **Code Transcription**: I transcribed the necessary parts of the notebook into `model.py`.
+-   **Bug Fixing**: While transcribing and testing the app the problems I find were related to versions of installed libraries and compatibilities
+-   **Testing**: I implemented unit tests to ensure that the model works correctly. All tests passed successfully.
+## Part II: API Development
+-   **API Structure**: I used FastAPI to crate the app structure in the `api.py` file.
+-   **Model Integration**: I Integrated the model training during the app creation and the inference in the predict endpoint
+-   **Testing**: I wrote tests for the API endpoints. Here I faced an issue with the version of anyio that had to be downgraded
+## Part III: Cloud Deployment
+- **Dockerfile** I started writing the Dockerfile, the only change I made was that I prefered the image python:3.10-slim instead of the latest python image because it's simpler, requires less space in memory and builds faster
+-   **Initial Approach - VM Instance**: Initially, I set up a virtual machine instance in Google Cloud Platform. I configured the necessary settings including CPU, memory, and networking options. And then I deployed and exposed the container. However I decided to change to a Cloud Run.     
+-   **Shift to Docker and Cloud Run**: I configured Google Cloud Run, to fully manage serverless platform and automatically scale the containers. The reasons for this change include:
+	- The API can handle a high number of requests, benefiting from Cloud Run's automatic scaling features.
+	- Cloud Run only charges per request
+	- Reduces the maintenance load compared to a VM
+## Part IV: Implementing CI/CD Pipeline
+-   **Github Actions**: Implement GitHub Actions for Continuous Integration and Continuous Deployment. So, I configured the pipeline with the `ci.yml` and `cd.yml` files to include the necessary steps. The pipelines includes:
+-   **CI**
+	- Install dependencies
+	- Run flake8 linting
+	- Run Tests
+	- Run code coverage
+-   **CD**
+	- Push Docker image to  [Docker Hub](https://hub.docker.com/r/deayalar/latam)
+	- Google Auth
+	- Deploy to Cloud Run [Endpoint](https://latam-jv4wystoza-uc.a.run.app)
 
-Logistic Regression: Limited to linear decision boundaries, unless polynomial features are used, which can increase complexity and computational time.
-XGBoost: Can model complex, non-linear decision boundaries, and has many hyperparameters that can be tuned to optimize performance.
-Robustness:
+### HTTP Request
+Call the deployed endpoint using this curl command
 
-Logistic Regression: Might be less robust to overfitting compared to regularized versions or with high-dimensionality data.
-XGBoost: Has built-in regularization parameters which can help in preventing overfitting.
-Generalization:
-
-Logistic Regression: May generalize well if the true underlying relationship is linear or approximately linear.
-XGBoost: Often generalizes well to unseen data, particularly if the data has complex, non-linear patterns.
-Considering these factors, if predictive performance is your primary goal and you're dealing with complex data patterns, you might choose XGBoost due to its ability to capture non-linear relationships and its generally higher predictive accuracy.
-
-On the other hand, if interpretability is a higher priority, or you're working with a dataset where the relationships are approximately linear, Logistic Regression could be the better choice. It will allow for easier interpretation and understanding of the model, which can be especially important in settings where you need to explain your model's decisions to stakeholders.
-
-Remember, the final decision should be based on the specific needs of your project and a thorough evaluation of the models on your particular dataset. It's often a good practice to try both approaches and compare results empirically.
+    curl  -X POST 'https://latam-jv4wystoza-uc.a.run.app/predict' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas", 
+                    "TIPOVUELO": "N", 
+                    "MES": 3
+                }
+            ]
+        }'
