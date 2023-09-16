@@ -49,3 +49,18 @@ Call the deployed endpoint using this curl command
                 }
             ]
         }'
+
+ ### Challenge submission
+ 
+    {
+	    "name": "David Ayala",
+	    "mail": "deayalar@gmail.com",
+	    "github_url": "https://github.com/deayalar/latam-challenge.git",
+	    "api_url": "https://latam-jv4wystoza-uc.a.run.app" 
+    }
+
+I got this response
+{
+  "status": "OK",
+  "detail": "your request was received"
+}
